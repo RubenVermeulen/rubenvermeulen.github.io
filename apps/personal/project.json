@@ -7,14 +7,19 @@
       "executor": "@angular-devkit/build-angular:browser",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/personal",
+        "outputPath": "dist/apps/personal/browser",
         "index": "apps/personal/src/index.html",
         "main": "apps/personal/src/main.ts",
         "polyfills": "apps/personal/src/polyfills.ts",
         "tsConfig": "apps/personal/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
-        "assets": ["apps/personal/src/favicon.ico", "apps/personal/src/assets"],
-        "styles": ["apps/personal/src/styles.scss"],
+        "assets": [
+          "apps/personal/src/favicon.ico",
+          "apps/personal/src/assets"
+        ],
+        "styles": [
+          "apps/personal/src/styles.scss"
+        ],
         "scripts": []
       },
       "configurations": {
@@ -62,24 +67,92 @@
       },
       "defaultConfiguration": "development"
     },
-    "extract-i18n": {
-      "executor": "@angular-devkit/build-angular:extract-i18n",
-      "options": {
-        "browserTarget": "personal:build"
-      }
-    },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["apps/personal/**/*.ts", "apps/personal/**/*.html"]
+        "lintFilePatterns": [
+          "apps/personal/**/*.ts",
+          "apps/personal/**/*.html"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/personal"],
+      "outputs": [
+        "coverage/apps/personal"
+      ],
       "options": {
         "jestConfig": "apps/personal/jest.config.ts",
         "passWithNoTests": true
+      }
+    },
+    "server": {
+      "executor": "@angular-devkit/build-angular:server",
+      "options": {
+        "outputPath": "dist/apps/personal/server",
+        "main": "apps/personal/server.ts",
+        "tsConfig": "apps/personal/tsconfig.server.json",
+        "inlineStyleLanguage": "scss"
+      },
+      "configurations": {
+        "production": {
+          "outputHashing": "media",
+          "fileReplacements": [
+            {
+              "replace": "apps/personal/src/environments/environment.ts",
+              "with": "apps/personal/src/environments/environment.prod.ts"
+            }
+          ]
+        },
+        "development": {
+          "optimization": false,
+          "sourceMap": true,
+          "extractLicenses": false
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve-ssr": {
+      "executor": "@nguniversal/builders:ssr-dev-server",
+      "configurations": {
+        "development": {
+          "browserTarget": "personal:build:development",
+          "serverTarget": "personal:server:development"
+        },
+        "production": {
+          "browserTarget": "personal:build:production",
+          "serverTarget": "personal:server:production"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "prerender": {
+      "executor": "@nguniversal/builders:prerender",
+      "options": {
+        "routes": [
+          "/"
+        ]
+      },
+      "configurations": {
+        "production": {
+          "browserTarget": "personal:build:production",
+          "serverTarget": "personal:server:production"
+        },
+        "development": {
+          "browserTarget": "personal:build:development",
+          "serverTarget": "personal:server:development"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "post-build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "cp apps/personal/Dockerfile dist/apps/personal/Dockerfile"
+          }
+        ]
       }
     }
   },
