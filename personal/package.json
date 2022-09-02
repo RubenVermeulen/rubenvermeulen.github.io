@@ -1,8 +1,0 @@
-{
-  "scripts": {
-    "serve:ssr": "node server/main.js"
-  },
-  "engines": {
-    "node": "16.x"
-  }
-}
