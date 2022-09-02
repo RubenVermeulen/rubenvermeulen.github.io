@@ -16,15 +16,18 @@ jobs:
       #- uses: nrwl/nx-set-shas@v2
 
       - name: Install
-        run: npm install
+        run: yarn --frozen-lockfile
 
       - name: Lint
         run: npx nx affected --target=lint
 
-      - name: Build
-        run: npx nx build
+      - name: Build (client & ssr)
+        run: |
+          npx nx build
+          npx nx server
+          npx nx post-build
 
-      - name: Deploy
+      - name: Release
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist/apps/personal
+          folder: dist/apps

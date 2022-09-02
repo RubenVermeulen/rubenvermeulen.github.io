@@ -6,7 +6,7 @@ import {UnderlineModule} from "./directives/link-styled/underline.module";
 
 @NgModule({
   declarations: [AppViewComponent],
-    imports: [BrowserModule, UnderlineModule],
+    imports: [BrowserModule.withServerTransition({ appId: 'serverApp' }), UnderlineModule],
   providers: [],
   bootstrap: [AppViewComponent],
 })
