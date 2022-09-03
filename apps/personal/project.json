@@ -14,7 +14,7 @@
         "tsConfig": "apps/personal/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
-          "apps/personal/src/favicon.ico",
+          "apps/personal/src/robots.txt",
           "apps/personal/src/assets"
         ],
         "styles": [

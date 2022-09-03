@@ -44,8 +44,3 @@ jobs:
       - name: Push (container image)
         run: |
           docker push registry.digitalocean.com/${{ secrets.DIGITALOCEAN_CONTAINER_REGISTRY_REPOSITORY }}/app-personal:latest
-
-#      - name: Release
-#        uses: JamesIves/github-pages-deploy-action@v4
-#        with:
-#          folder: dist/apps
