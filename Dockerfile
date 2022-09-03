@@ -1,12 +1,12 @@
 FROM node:16-slim
 
-ARG FOLDER_APP_BUNDLE
+ARG APP_BUNDLE_PATH
 
 # Create app directory
 WORKDIR /usr/src/app
 
 # Bundle app source
-COPY ${FOLDER_APP_BUNDLE} .
+COPY ${APP_BUNDLE_PATH} .
 
 EXPOSE 4000
 

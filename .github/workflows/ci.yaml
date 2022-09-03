@@ -5,6 +5,9 @@ on:
       - main
   pull_request:
 
+env:
+  CONTAINER_REGISTRY: registry.digitalocean.com/${{ secrets.DIGITALOCEAN_CONTAINER_REGISTRY_REPOSITORY }}
+
 jobs:
   main:
     runs-on: ubuntu-latest
@@ -13,9 +16,10 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       #- uses: nrwl/nx-set-shas@v2
 
-      - name: Install (dependencies)
+      - name: Install dependencies
         run: |
           yarn --frozen-lockfile
 
@@ -23,24 +27,39 @@ jobs:
         run: |
           npx nx affected --target=lint
 
-      - name: Build (client & ssr)
+      - name: Build client & ssr
         run: |
           npx nx build
           npx nx server
 
-      - name: Install (doctl)
-        uses: digitalocean/action-doctl@v2
+      - name: Login into registry
+        run: |
+          docker login -u ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} -p ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} registry.digitalocean.com
+
+      - name: Set image tag
+        run: |
+          echo "CONTAINER_IMAGE_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Build image
+        run: |
+          docker build . --build-arg APP_BUNDLE_PATH=dist/apps/personal -t ${{ env.CONTAINER_REGISTRY }}/app-personal:${{ env.CONTAINER_IMAGE_TAG }} -t ${{ env.CONTAINER_REGISTRY }}/app-personal:latest
+
+      - name: Push to registry
+        run: |
+          docker push --all-tags ${{ env.CONTAINER_REGISTRY }}/app-personal
+
+      - name: Deploy to app platform
+        uses: digitalocean/app_action@main
         with:
+          app_name: rubenvermeulen-be
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-      - name: Login (container registry)
-        run: |
-          doctl registry login
-
-      - name: Build (container image)
-        run: |
-          docker build . --build-arg FOLDER_APP_BUNDLE=dist/apps/personal -t registry.digitalocean.com/${{ secrets.DIGITALOCEAN_CONTAINER_REGISTRY_REPOSITORY }}/app-personal:latest
-
-      - name: Push (container image)
-        run: |
-          docker push registry.digitalocean.com/${{ secrets.DIGITALOCEAN_CONTAINER_REGISTRY_REPOSITORY }}/app-personal:latest
+          images: '[
+                    {
+                      "name": "app-personal",
+                      "image":{
+                        "registry_type": "DOCR",
+                        "repository": "app-personal",
+                        "tag": "${{ env.CONTAINER_IMAGE_TAG }}"
+                      }
+                    }
+                  ]'
