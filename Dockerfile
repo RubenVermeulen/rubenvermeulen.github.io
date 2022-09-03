@@ -1,11 +1,13 @@
-FROM node:16
+FROM node:16-slim
+
+ARG FOLDER_APP_BUNDLE
 
 # Create app directory
 WORKDIR /usr/src/app
 
 # Bundle app source
-COPY . .
+COPY ${FOLDER_APP_BUNDLE} .
 
-EXPOSE 8080
+EXPOSE 4000
 
 CMD [ "node", "server/main.js" ]

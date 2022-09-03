@@ -144,16 +144,6 @@
         }
       },
       "defaultConfiguration": "production"
-    },
-    "post-build": {
-      "executor": "nx:run-commands",
-      "options": {
-        "commands": [
-          {
-            "command": "cp apps/personal/Dockerfile dist/apps/personal/Dockerfile"
-          }
-        ]
-      }
     }
   },
   "tags": []

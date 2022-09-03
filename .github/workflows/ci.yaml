@@ -15,19 +15,37 @@ jobs:
           fetch-depth: 0
       #- uses: nrwl/nx-set-shas@v2
 
-      - name: Install
-        run: yarn --frozen-lockfile
+      - name: Install (dependencies)
+        run: |
+          yarn --frozen-lockfile
 
       - name: Lint
-        run: npx nx affected --target=lint
+        run: |
+          npx nx affected --target=lint
 
       - name: Build (client & ssr)
         run: |
           npx nx build
           npx nx server
-          npx nx post-build
 
-      - name: Release
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Install (doctl)
+        uses: digitalocean/action-doctl@v2
         with:
-          folder: dist/apps
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Login (container registry)
+        run: |
+          doctl registry login
+
+      - name: Build (container image)
+        run: |
+          docker build . --build-arg FOLDER_APP_BUNDLE=dist/apps/personal -t registry.digitalocean.com/${{ secrets.DIGITALOCEAN_CONTAINER_REGISTRY_REPOSITORY }}/app-personal:latest
+
+      - name: Push (container image)
+        run: |
+          docker push registry.digitalocean.com/${{ secrets.DIGITALOCEAN_CONTAINER_REGISTRY_REPOSITORY }}/app-personal:latest
+
+#      - name: Release
+#        uses: JamesIves/github-pages-deploy-action@v4
+#        with:
+#          folder: dist/apps
