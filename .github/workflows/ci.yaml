@@ -48,18 +48,18 @@ jobs:
         run: |
           docker push --all-tags ${{ env.CONTAINER_REGISTRY }}/app-personal
 
-      - name: Deploy to app platform
-        uses: digitalocean/app_action@main
-        with:
-          app_name: rubenvermeulen-be
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          images: '[
-                    {
-                      "name": "app-personal",
-                      "image":{
-                        "registry_type": "DOCR",
-                        "repository": "app-personal",
-                        "tag": "${{ env.CONTAINER_IMAGE_TAG }}"
-                      }
-                    }
-                  ]'
+#      - name: Deploy to app platform
+#        uses: digitalocean/app_action@main
+#        with:
+#          app_name: rubenvermeulen-be
+#          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+#          images: '[
+#                    {
+#                      "name": "app-personal",
+#                      "image":{
+#                        "registry_type": "DOCR",
+#                        "repository": "app-personal",
+#                        "tag": "${{ env.CONTAINER_IMAGE_TAG }}"
+#                      }
+#                    }
+#                  ]'
