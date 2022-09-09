@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  CONTAINER_REGISTRY: registry.digitalocean.com/${{ secrets.DIGITALOCEAN_CONTAINER_REGISTRY_REPOSITORY }}
+  CONTAINER_REPOSITORY: ghcr.io/rubenvermeulen/web-app-portfolio
 
 jobs:
   main:
@@ -34,7 +34,7 @@ jobs:
 
       - name: Login into registry
         run: |
-          docker login -u ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} -p ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} registry.digitalocean.com
+          docker login ghcr.io -u ${{ secrets.CONTAINER_REGISTRY_USERNAME }} -p ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set image tag
         run: |
@@ -42,24 +42,8 @@ jobs:
 
       - name: Build image
         run: |
-          docker build . --build-arg APP_BUNDLE_PATH=dist/apps/personal -t ${{ env.CONTAINER_REGISTRY }}/app-personal:${{ env.CONTAINER_IMAGE_TAG }} -t ${{ env.CONTAINER_REGISTRY }}/app-personal:latest
+          docker build . --build-arg APP_BUNDLE_PATH=dist/apps/personal -t ${{ env.CONTAINER_REPOSITORY }}:${{ env.CONTAINER_IMAGE_TAG }} -t ${{ env.CONTAINER_REPOSITORY }}:latest
 
       - name: Push to registry
         run: |
-          docker push --all-tags ${{ env.CONTAINER_REGISTRY }}/app-personal
-
-#      - name: Deploy to app platform
-#        uses: digitalocean/app_action@main
-#        with:
-#          app_name: rubenvermeulen-be
-#          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-#          images: '[
-#                    {
-#                      "name": "app-personal",
-#                      "image":{
-#                        "registry_type": "DOCR",
-#                        "repository": "app-personal",
-#                        "tag": "${{ env.CONTAINER_IMAGE_TAG }}"
-#                      }
-#                    }
-#                  ]'
+          docker push --all-tags ${{ env.CONTAINER_REPOSITORY }}
